@@ -59,9 +59,10 @@
 
 (defn list-prices
   "The list of book prices from Stripe."
-  [{:keys [limit]}]
+  [{:keys [active limit]}]
   (->> (Price/list
         (cond-> {"expand" ["data.product"]}
+          (boolean? active) (assoc "active" active)
           (and (number? limit) (pos? limit)) (assoc "limit" limit)))
        (.getData)
        (into [])

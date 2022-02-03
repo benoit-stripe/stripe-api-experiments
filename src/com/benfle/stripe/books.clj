@@ -1,6 +1,5 @@
 (ns com.benfle.stripe.books
   (:require [ring.adapter.jetty :refer [run-jetty]]
-            [com.benfle.stripe.books.inventory :as inventory]
             [com.benfle.stripe.books.services.prebuilt-checkout :as prebuilt-checkout])
   (:import [com.stripe Stripe]))
 
@@ -38,13 +37,18 @@
            '[com.benfle.stripe.books.services.prebuilt-checkout :as prebuilt-checkout] :reload
            '[com.benfle.stripe.books :as books] :reload)
 
+  (add-tap (fn [v]
+             (pprint v)))
+
   (books/set-stripe-api-key!)
 
-  (def prices (inventory/list-prices {:limit 25}))
+  ;; Start Stripe webhook listener with: stripe listen --forward-to http://localhost:3000/stripe/webhooks
+  ;; Replace webhook-secret below
 
   (let [port 3000
-        handler (prebuilt-checkout/web-app {:prices prices
-                                            :service-url (str "http://localhost:" port)})]
+        webhook-secret "whsec_e0b615010c75afe4c664abdb8f7afaf87c3fb99c68308a83651f1af6eab3c4e8"
+        handler (prebuilt-checkout/web-app {:service-url (str "http://localhost:" port)
+                                            :webhook-secret webhook-secret})]
     (def server (books/start-http-server {:port port
                                           :handler handler})))
 
