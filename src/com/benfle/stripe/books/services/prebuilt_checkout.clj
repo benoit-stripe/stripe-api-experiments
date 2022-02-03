@@ -66,6 +66,10 @@
     [:a {:href "/"}
      "Go back to the list of books."]]))
 
+;; Note: There is a risk of "double sale" if another customer purchases
+;; the same product before we have time to deactivate the price.
+;; It is still unclear whether this issue can be solved with Stripe or
+;; if we have to implement our own lock.
 (defn fulfill-order
   [{:keys [id]}]
   (let [price (-> (Session/retrieve id {"expand" ["line_items"]} nil)
