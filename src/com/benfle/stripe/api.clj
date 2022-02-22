@@ -54,6 +54,18 @@
                       {:http-request http-request
                        :http-response (assoc http-response :body payload)})))))
 
+(defn create-customer
+  [client params]
+  (submit client {:request-method :post
+                  :uri "/v1/customers"
+                  :query-string (map->query-string params)}))
+
+(defn list-payment-methods
+  [client {:keys [id]} params]
+  (submit client {:request-method :get
+                  :uri (str "/v1/customers/" id "/payment_methods")
+                  :query-string (map->query-string params)}))
+
 (defn create-payment-intent
   [client params]
   (submit client {:request-method :post
@@ -82,6 +94,36 @@
   [client {:keys [id]} params]
   (submit client {:request-method :post
                   :uri (str "/v1/payment_intents/" id "/capture")
+                  :query-string (map->query-string params)}))
+
+(defn create-setup-intent
+  [client params]
+  (submit client {:request-method :post
+                  :uri "/v1/setup_intents"
+                  :query-string (map->query-string params)}))
+
+(defn update-setup-intent
+  [client {:keys [id]} params]
+  (submit client {:request-method :post
+                  :uri (str "/v1/setup_intents/" id)
+                  :query-string (map->query-string params)}))
+
+(defn retrieve-setup-intent
+  [client {:keys [id]} params]
+  (submit client {:request-method :get
+                  :uri (str "/v1/setup_intents/" id)
+                  :query-string (map->query-string params)}))
+
+(defn confirm-setup-intent
+  [client {:keys [id]} params]
+  (submit client {:request-method :get
+                  :uri (str "/v1/setup_intents/" id "/confirm")
+                  :query-string (map->query-string params)}))
+
+(defn cancel-setup-intent
+  [client {:keys [id]} params]
+  (submit client {:request-method :get
+                  :uri (str "/v1/setup_intents/" id "/cancel")
                   :query-string (map->query-string params)}))
 
 (comment

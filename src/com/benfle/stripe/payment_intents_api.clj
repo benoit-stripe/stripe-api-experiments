@@ -2,53 +2,6 @@
   "Scenarios for the Payment Intents API."
   (:require [com.benfle.stripe.api :as api]))
 
-;; source: https://stripe.com/docs/testing#regulatory-cards
-(def credit-card-numbers
-  #{{:succeed? true
-     :authentication-required :never
-     :number "4242424242424242"}
-    {:succeed? true
-     :authenticated-required :on-setup
-     :number "4000002500003155"}
-    {:succeed? true
-     :authentication-required :always
-     :number "4000002760003184"}
-    {:succeed? false
-     :authenticated-required :on-setup
-     :number "4000008260003178"}
-    ;; TODO: Clarify scenario
-    {:succeed? true
-     :authenticated-required :always
-     :number "4000008260003178"}})
-
-(defn card-such-that
-  "A card that matches the given predicate."
-  [p]
-  (when-let [{:keys [number]} (->> credit-card-numbers
-                                   (filter p)
-                                   rand-nth)]
-    {:exp_month "01"
-     :exp_year "2032"
-     :number number
-     :cvc "000"}))
-
-;; source: https://stripe.com/docs/testing#regulatory-cards
-(def payment-methods
-  #{{:succeed? true
-     :authentication-required :always
-     :id "pm_card_authenticationRequired"}
-    {:succeed? true
-     :authentication-required :on-setup
-     :id "pm_card_authenticationRequiredOnSetup"}})
-
-(defn pm-such-that
-  "A payment method that matches the predicate."
-  [p]
-  (->> payment-methods
-       (filter p)
-       rand-nth
-       :id))
-
 (defn confirm-on-create
   "PI is confirmed when created."
   [client {:keys [amount currency payment-method-data]}]
@@ -79,7 +32,7 @@
 
 (comment
 
-  (require '[com.benfle.stripe.api :as api] :reload
+  (require '[com.benfle.stripe.api :as api]
            '[com.benfle.stripe.payment-intents-api :as pi-api] :reload)
 
   (def client (api/client {:api-key (System/getenv "STRIPE_API_KEY")}))
